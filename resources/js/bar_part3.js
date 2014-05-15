@@ -1,5 +1,6 @@
-var width = 700;
-var height = 350;
+var margin = { top: 20, right: 30, bottom: 30, left: 40 };
+var width = 700 - margin.left - margin.right;
+var height = 350 - margin.top - margin.bottom;
 
 // Automatically space our columns, snap to pixel (round) and pad (percentage) between bars
 var x = d3.scale.ordinal().rangeRoundBands([0, width], .1);
@@ -8,8 +9,11 @@ var y = d3.scale.linear().range([height, 0]); // We don't know the size of the d
 
 // In the column chart, we are going to fix both the width and height up front
 var chart = d3.select(".chart").
-    attr("width", width).
-    attr("height", height);
+    attr("width", width + margin.left + margin.right).
+    attr("height", height + margin.top + margin.bottom).
+    append("g").
+    attr("transform", "translate("+margin.left+", "+margin.top+")");
+
 
 // Let's load the data from a separate file
 d3.csv("data/bar_part2.csv", type, function(error, data) {
