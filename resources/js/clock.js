@@ -46,40 +46,37 @@ clock.append("circle").
     attr("fill", "black").
     attr("class", "clock innercircle");
 
+
+var secondAngle = function(d) { return scaleSecs(d.numeric); };
+var minuteAngle = function(d) { return scaleMins(d.numeric); };
+var hourAngle = function(d) { return scaleHours(d.numeric % 12); };
+
+var secondArc = d3.svg.arc()
+    .innerRadius(0)
+    .outerRadius(70)
+    .startAngle(secondAngle)
+    .endAngle(secondAngle);
+
+var minuteArc = d3.svg.arc()
+    .innerRadius(0)
+    .outerRadius(70)
+    .startAngle(minuteAngle)
+    .endAngle(minuteAngle);
+
+var hourArc = d3.svg.arc()
+    .innerRadius(0)
+    .outerRadius(50)
+    .startAngle(hourAngle)
+    .endAngle(hourAngle);
+
+
+
 var renderHands = function(data) {
-    clock.selectAll(".clockhand").remove(); // Remove the existing hands...
+    var handles = clock.selectAll(".clockhand")
+        .data(data, function(d) { return d.unit; });
 
-    var secondArc = d3.svg.arc()
-        .innerRadius(0)
-        .outerRadius(70)
-        .startAngle(function(d) {return scaleSecs(d.numeric); })
-        .endAngle(function(d) { return scaleSecs(d.numeric); });
-
-    var minuteArc = d3.svg.arc()
-        .innerRadius(0)
-        .outerRadius(70)
-        .startAngle(function (d) { return scaleMins(d.numeric); })
-        .endAngle(function (d) { return scaleMins(d.numeric); });
-
-    var hourArc = d3.svg.arc()
-        .innerRadius(0)
-        .outerRadius(50)
-        .startAngle(function (d) { return scaleHours(d.numeric % 12); })
-        .endAngle(function(d) { return scaleHours(d.numeric % 12); });
-
-    clock.selectAll(".clockhand")
-        .data(data)
-        .enter()
+    handles.enter()
         .append("path")
-        .attr("d", function(d) {
-            if (d.unit === "seconds") {
-                return secondArc(d);
-            } else if (d.unit === "minutes") {
-                return minuteArc(d);
-            } else if (d.unit === "hours") {
-                return hourArc(d);
-            }
-        })
         .attr("class", "clockhand")
         .attr("stroke", "black")
         .attr("stroke-width", function(d) {
@@ -92,7 +89,18 @@ var renderHands = function(data) {
             }
         })
         .attr("fill", "none");
-}
+
+    handles
+        .attr("d", function(d) {
+            if (d.unit === "seconds") {
+                return secondArc(d);
+            } else if (d.unit === "minutes") {
+                return minuteArc(d);
+            } else if (d.unit === "hours") {
+                return hourArc(d);
+            }
+        })
+};
 
 setInterval(function() {
     return renderHands(fields());
